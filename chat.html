@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat test</title>
+    <script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="form">
+     <div class="wrap">
+         <label for="name">Твоё имя</label>
+         <input type="text" id="name">
+     </div>
+     <div class="wrap">
+         <label for="message">Ты говориш:</label>
+         <input type="text" id="message">
+     </div>
+     <div class="wrap">
+         <label for="to">Кому:</label>
+         <input type="text" id="to">
+     </div>
+      
+      <input type="button" value="connect" id="connect">
+      <input type="hidden" value="send" id="send">
+      <input type="hidden" value="disconnect" id="disconnect">
+  </div>
+  <div class="result">
+      <div class="container">
+          <div class="append"></div>
+      </div>      
+  </div>
+  <button class="clear">очистить холст</button>
+  
+   
+   
+   <script>
+       var socket;
+       $('#connect').on('click',function(){
+           var socket = new WebSocket("ws://ws:8080");
+           socket.onopen = function() {
+//              alert("Соединение установлено.");
+               $('.append').append('<p>Соединение установлено.</p>');
+                $('#connect').attr('type','hidden');
+                $('#disconnect').attr('type','button');
+                $('#send').attr('type','button');
+               console.log(socket);
+            };
+
+            socket.onclose = function(event) {
+              if (event.wasClean) {
+//                alert('Соединение закрыто чисто');
+                  $('.append').append('<p>Соединение закрыто чисто</p>');
+              } else {
+//                alert('Обрыв соединения'); // например, "убит" процесс сервера
+                $('.append').append('<p>Обрыв соединения</p>');
+              }
+//              alert('Код: ' + event.code + ' причина: ' + event.reason);
+                $('#connect').attr('type','button');
+                $('#disconnect').attr('type','hidden');
+                
+            };
+
+            socket.onmessage = function(event) {
+//              alert("Получены данные " + event.data);
+                $('.append').append('<p>' + event.data + '</p>');
+            };
+
+            socket.onerror = function(error) {
+              alert("Ошибка " + error.message);
+            };
+           
+            $('#send').on('click',function(){
+                name = $('#name').val();
+                mess = $('#message').val();
+                to = $('#to').val();
+                date = {name:name,text:mess,to:to};
+                console.log(date);
+                socket.send(JSON.stringify(date));
+            });
+           
+           $('#disconnect').on('click',function(){
+                socket.close();
+            });
+           
+       });       
+    </script>
+    <script src="custom.js"></script>
+</body>
+</html>

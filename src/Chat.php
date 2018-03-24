@@ -2,6 +2,7 @@
 namespace MyApp;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
+use MyApp\model\DataBase;
 
 class Chat implements MessageComponentInterface {
     protected $clients;
@@ -18,14 +19,19 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
+//        print_r($msg);
+        $msg = json_decode($msg,true);
         $numRecv = count($this->clients) - 1;
         echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
-            , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
-
+            , $from->resourceId, $msg['name'], $numRecv, $numRecv == 1 ? '' : 's');
+        echo $msg['to'];
         foreach ($this->clients as $client) {
-            if ($from !== $client) {
-                // The sender is not the receiver, send to each client connected
-                $client->send($msg);
+//            if ($from !== $client) {
+//                // The sender is not the receiver, send to each client connected
+//                $client->send($msg['name']);
+//            }
+            if($client->resourceId == $msg['to']){
+                $client->send($msg['text']);
             }
         }
     }
