@@ -16,6 +16,10 @@
          <input type="text" id="name">
      </div>
      <div class="wrap">
+         <label for="hash">Хэш</label>
+         <input type="text" id="hash">
+     </div>
+     <div class="wrap">
          <label for="message">Ты говориш:</label>
          <input type="text" id="message">
      </div>
@@ -67,6 +71,7 @@
             socket.onmessage = function(event) {
 //              alert("Получены данные " + event.data);
                 $('.append').append('<p>' + event.data + '</p>');
+                console.log(event);
             };
 
             socket.onerror = function(error) {
@@ -77,7 +82,8 @@
                 name = $('#name').val();
                 mess = $('#message').val();
                 to = $('#to').val();
-                date = {name:name,text:mess,to:to};
+                hash = $('#hash').val();
+                date = {name:name,text:mess,to:to,hash:hash};
                 console.log(date);
                 socket.send(JSON.stringify(date));
             });
